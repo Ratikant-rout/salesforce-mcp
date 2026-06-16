@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: salesforce-mcp
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python server.py
+    envVars:
+      - key: SF_USERNAME
+        sync: false
+      - key: SF_PASSWORD
+        sync: false
+      - key: SF_SECURITY_TOKEN
+        sync: false
+      - key: SF_DOMAIN
+        value: login
+      - key: PORT
+        value: 8000
