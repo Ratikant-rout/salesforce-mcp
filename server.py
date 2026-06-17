@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
 from simple_salesforce import Salesforce
+import uvicorn
 
 load_dotenv()
 
@@ -72,10 +73,15 @@ def create_compliance_record(
 
 @mcp.tool()
 def update_record_status(record_id: str, status: str) -> dict:
-    """Update the Status__c field on a Compliance__c record."""
+    """Update Status__c on a Compliance__c record."""
     sf = get_sf()
     sf.Compliance__c.update(record_id, {"Status__c": status})
     return {"updated": record_id, "status": status}
 
 if __name__ == "__main__":
-    mcp.run(transport="streamable-http")
+    port = int(os.getenv("PORT", 10000))
+    uvicorn.run(
+        app=mcp.sse_app(),
+        host="0.0.0.0",
+        port=port
+    )
