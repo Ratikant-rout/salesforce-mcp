@@ -32,16 +32,23 @@ TOOLS = [
         }
     },
     {
-        "name": "search_accounts",
-        "description": "Search US Store accounts by name",
-        "inputSchema": {
-            "type": "object",
-            "properties": {
-                "name_filter": {"type": "string"}
-            },
-            "required": ["name_filter"]
-        }
+    "name": "search_accounts",
+    "description": "Search US Store accounts by name",
+    "inputSchema": {
+        "type": "object",
+        "properties": {
+            "name_filter": {"type": "string"}
+        },
+        "required": ["name_filter"]
     },
+    "outputSchema": {
+        "type": "object",
+        "properties": {
+            "Id": {"type": "string", "description": "Account ID"},
+            "Name": {"type": "string", "description": "Account Name"}
+        }
+    }
+},
     {
         "name": "get_case_by_caseNumber",
         "description": "getCaseDetailsByCaseNumber",
