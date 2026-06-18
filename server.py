@@ -43,6 +43,17 @@ TOOLS = [
         }
     },
     {
+        "name": "get_case_by_caseNumber",
+        "description": "getCaseDetailsByCaseNumber",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "case_number": {"type": "string"}
+            },
+            "required": ["case_number"]
+        }
+    },
+    {
         "name": "get_compliance_records",
         "description": "Fetch Compliance__c records",
         "inputSchema": {
@@ -77,6 +88,9 @@ def execute_tool(name, args):
         query = "SELECT Id, Name, Store__c, Vendor__c, Status__c, Expiration_Date__c, Service_Start_Date__c FROM Compliance__c WHERE RecordType.Name = 'Pest_Control_Vendor'"
         if args.get("store_name"):
             query += f" AND Store__r.Name = '{args['store_name']}'"
+        return sf.query_all(query)["records"]
+    elif name == "get_case_by_caseNumber":
+        query = f"SELECT Id, Subject, Description FROM Case WHERE CaseNumber = '{args['case_number']}'"
         return sf.query_all(query)["records"]
     elif name == "search_accounts":
         query = f"SELECT Id, Name FROM Account WHERE RecordType.DeveloperName = 'US_Store' AND Name LIKE '%{args['name_filter']}%' LIMIT 20"
