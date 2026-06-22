@@ -136,16 +136,16 @@ def execute_tool(name, args):
             result = sf.query_all(query)
             return result["records"]
 
-elif name == "search_accounts":
-    name_filter = args.get("name_filter", "")
-    query = f"""
-        SELECT Id, Name, Industry, Type, AnnualRevenue, NumberOfEmployees, RecordType.Name
-        FROM Account
-        WHERE Name LIKE '%{name_filter}%'
-        LIMIT 20
-    """
-    result = sf.query_all(query)
-    return result["records"]
+        elif name == "search_accounts":
+            name_filter = args.get("name_filter", "")
+            query = f"""
+                SELECT Id, Name, Industry, Type, AnnualRevenue, NumberOfEmployees, RecordType.Name
+                FROM Account
+                WHERE Name LIKE '%{name_filter}%'
+                LIMIT 20
+            """
+            result = sf.query_all(query)
+            return result["records"]
 
         elif name == "create_compliance_record":
             payload = {
