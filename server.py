@@ -169,6 +169,27 @@ def execute_tool(name, args):
 async def health(request):
     return JSONResponse({"status": "ok", "server": "Salesforce MCP"})
 
+async def debug_auth(request):
+    my_domain = os.getenv("SF_MY_DOMAIN_URL") or os.getenv("SF_MY_DOMAIN")
+    client_id = os.getenv("SF_CLIENT_ID")
+    client_secret = os.getenv("SF_CLIENT_SECRET")
+
+    url = f"{my_domain}/services/oauth2/token"
+    data = {
+        "grant_type": "client_credentials",
+        "client_id": client_id,
+        "client_secret": client_secret
+    }
+    response = requests.post(url, data=data)
+    return JSONResponse({
+        "my_domain": my_domain,
+        "client_id_length": len(client_id) if client_id else 0,
+        "client_id_preview": f"{client_id[:15]}...{client_id[-10:]}" if client_id else None,
+        "client_secret_length": len(client_secret) if client_secret else 0,
+        "status": response.status_code,
+        "response": response.text
+    })
+
 async def mcp_handler(request):
     if request.method == "GET":
         async def event_stream():
@@ -250,6 +271,7 @@ async def mcp_handler(request):
 
 routes = [
     Route("/", health),
+    Route("/debug-auth", debug_auth),
     Route("/mcp", mcp_handler, methods=["GET", "POST"]),
     Route("/sse", mcp_handler, methods=["GET", "POST"]),
 ]
