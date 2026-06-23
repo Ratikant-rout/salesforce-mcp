@@ -121,19 +121,19 @@ def execute_tool(name, args):
             result = sf.query_all(soql)
             return {"totalSize": result["totalSize"], "records": result["records"]}
 
-        elif name == "get_case_by_caseNumber":
-            case_number = args.get("case_number", "")
-            query = f"""
-                SELECT Id, CaseNumber, Subject, Description,
-                       Status, Priority, Origin, CreatedDate,
-                       Account.Name, Contact.Name
-                FROM Case
-                WHERE CaseNumber = '{case_number}'
-            """
-            result = sf.query_all(query)
-            if result["totalSize"] == 0:
-                return {"message": f"No case found with case number {case_number}"}
-            return result["records"]
+elif name == "get_case_by_caseNumber":
+    case_number = args.get("case_number", "")
+    query = f"""
+        SELECT Id, CaseNumber, Subject, Description,
+               Status, Priority, Origin, CreatedDate,
+               Account.Name, Contact.Name
+        FROM Case
+        WHERE CaseNumber = '{case_number}'
+    """
+    result = sf.query_all(query)
+    if result["totalSize"] == 0:
+        return {"message": f"No case found with case number {case_number}"}
+    return result["records"][0]  # ← return single object, not list
 
         elif name == "get_compliance_records":
             query = """
@@ -257,24 +257,33 @@ async def mcp_handler(request):
             "result": {"tools": TOOLS}
         })
 
-    elif method == "tools/call":
-        tool_name = params.get("name")
-        tool_args = params.get("arguments", {})
-        try:
-            result = execute_tool(tool_name, tool_args)
-            return JSONResponse({
-                "jsonrpc": "2.0",
-                "id": req_id,
-                "result": {
-                    "content": [{"type": "text", "text": json.dumps(result)}]
-                }
-            })
-        except Exception as e:
-            return JSONResponse({
-                "jsonrpc": "2.0",
-                "id": req_id,
-                "error": {"code": -32000, "message": str(e)}
-            })
+elif method == "tools/call":
+    tool_name = params.get("name")
+    tool_args = params.get("arguments", {})
+    try:
+        result = execute_tool(tool_name, tool_args)
+        
+        # If result is a list (like case/account records), take first item for structured output
+        structured_result = result
+        if isinstance(result, list) and len(result) > 0:
+            structured_result = result[0]
+        elif isinstance(result, list) and len(result) == 0:
+            structured_result = {"message": "No records found"}
+        
+        return JSONResponse({
+            "jsonrpc": "2.0",
+            "id": req_id,
+            "result": {
+                "content": [{"type": "text", "text": json.dumps(result)}],
+                "structuredContent": structured_result
+            }
+        })
+    except Exception as e:
+        return JSONResponse({
+            "jsonrpc": "2.0",
+            "id": req_id,
+            "error": {"code": -32000, "message": str(e)}
+        })
 
     else:
         return JSONResponse({"jsonrpc": "2.0", "id": req_id, "result": {}})
