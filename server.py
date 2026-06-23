@@ -59,16 +59,27 @@ TOOLS = [
         }
     },
     {
-        "name": "get_case_by_caseNumber",
-        "description": "Get case details by case number from Salesforce",
-        "inputSchema": {
-            "type": "object",
-            "properties": {
-                "case_number": {"type": "string"}
-            },
-            "required": ["case_number"]
-        }
+    "name": "get_case_by_caseNumber",
+    "description": "Get case details by case number from Salesforce",
+    "inputSchema": {
+        "type": "object",
+        "properties": {
+            "case_number": {"type": "string"}
+        },
+        "required": ["case_number"]
     },
+    "outputSchema": {
+        "type": "object",
+        "properties": {
+            "Id": {"type": "string", "description": "Case record ID"},
+            "CaseNumber": {"type": "string", "description": "Case number"},
+            "Subject": {"type": "string", "description": "Case subject"},
+            "Status": {"type": "string", "description": "Case status"},
+            "Priority": {"type": "string", "description": "Case priority"},
+            "Description": {"type": "string", "description": "Case description"}
+        }
+    }
+},
     {
         "name": "get_compliance_records",
         "description": "Fetch Compliance__c records optionally filtered by store name",
